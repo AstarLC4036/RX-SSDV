@@ -1,4 +1,5 @@
-﻿using RX_SSDV.Base;
+﻿using ReedSolomon;
+using RX_SSDV.Base;
 using RX_SSDV.IO;
 using RX_SSDV.UI;
 using RX_SSDV.Utils;
@@ -24,8 +25,8 @@ namespace RX_SSDV.Decoder
         public string imageFilePath = $"{AppDomain.CurrentDomain.BaseDirectory}outputs/output-image.jpg";
         public readonly string ssdvDecoderPath = $"{AppDomain.CurrentDomain.BaseDirectory}ssdv.exe";
 
-        public const int RECEIVE_TIMEOUT_BASEBAND = 2000;
-        public const int RECEIVE_TIMEOUT_DEFAULT = 4000;
+        public const int RECEIVE_TIMEOUT_BASEBAND = 4000;
+        public const int RECEIVE_TIMEOUT_DEFAULT = 6000;
 
         Process process;
         ProcessStartInfo startInfo;
@@ -106,6 +107,9 @@ namespace RX_SSDV.Decoder
                         decoderTimer.Stop();
                         decoderTimer.Start();
                     }
+
+                    // Do FEC
+                    Rs8.Decode(dataBuffer, Span<int>.Empty, true);
 
                     // Replace with standard SSDV header
                     ReplaceSSDVHeader();

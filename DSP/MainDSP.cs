@@ -85,7 +85,9 @@ namespace RX_SSDV.DSP
         #endregion
 
         #region SSDV Process
-        public static int symobolRate = 9600;
+        //TODO: make it editable
+        public static int symbolRate = 9600;
+        public static int packetSize = 255;
         private static int samplesPerSymbol = 5;
         public static int SamplePerSymbol => samplesPerSymbol;
 
@@ -146,7 +148,7 @@ namespace RX_SSDV.DSP
         {
             fft = new Fft(FFT_SIZE);
             bpskDemod = new BpskDemod();
-            ccsds = new CCSDSDecoder(true, true, 255, new AsrtuDecoder());
+            ccsds = new CCSDSDecoder(true, true, packetSize, new AsrtuDecoder());
 
             UpdateBitmap(spectrum.Width);
 
@@ -157,13 +159,18 @@ namespace RX_SSDV.DSP
             StartDrawing();
         }
 
+        public void ResetDecoder()
+        {
+            bpskDemod = new BpskDemod();
+        }
+
         /// <summary>
         /// Get samples per symbol
         /// </summary>
         /// <returns>Samples per symbol</returns>
         public static int GetSPS()
         {
-            int sps = sampleRate / symobolRate;
+            int sps = sampleRate / symbolRate;
             return sps;
         }
 
