@@ -400,7 +400,8 @@ namespace RX_SSDV.DSP
                     $"\nBandwidth: {bandwidth}kHz, Frequency Shift: {frequencyShift}kHz" +
                     $"\nTime {SampleSource.GetFormatedTimeString()}" +
                     $"\nCostas Loop [freq = {bpskDemod.costasLoop.Phase}, phase = {bpskDemod.costasLoop.Phase}]" +
-                    $"\nClock Sync [mu = {bpskDemod.clockRecovery.Mu}, omega = {bpskDemod.clockRecovery.Omega}]",
+                    $"\nClock Sync [mu = {bpskDemod.clockRecovery.Mu}, omega = {bpskDemod.clockRecovery.Omega}]" +
+                    $"\nSNR: {bpskDemod.snr_estimator.snr()}db",
                     font, brush, new Point(5, 5));
 
                 //Separator
@@ -577,8 +578,10 @@ namespace RX_SSDV.DSP
                 }
                 fft.Direct(realSignal, imagSignal, fftReal, fftImag);
 
+                const double offset = 0.00000001; //Add a tiny offset to prevent doing Log10(0)
+
                 double[] tempSpectrum = fftReal
-                    .Select((v, i) => Math.Sqrt(v * v + fftImag[i] * fftImag[i]))
+                    .Select((v, i) => 10*Math.Log10( Math.Sqrt(v * v + fftImag[i] * fftImag[i]) + offset) )
                     .ToArray();
 
                 //must new object, or use object pool
