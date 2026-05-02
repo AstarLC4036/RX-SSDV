@@ -19,7 +19,7 @@ namespace RX_SSDV.DSP
         public FeedforwardAGC agc;
         public ComplexFirFilter rrcFilter;
         public FreqShift freqShift;
-        public M2M4SNREstimator snr_estimator;
+        public M2M4SNREstimator snrEstimator;
 
         private float[] outputBufferI;
         private float[] outputBufferQ;
@@ -110,7 +110,7 @@ namespace RX_SSDV.DSP
             agc = new FeedforwardAGC(1, 0.25f);
             float[] rrcTaps = FilterUtils.RootRaisedCosine(16, MainDSP.GetSPS(), 1 , 0.35f, 11 * MainDSP.SamplePerSymbol);
             rrcFilter = new ComplexFirFilter(rrcTaps, new float[rrcTaps.Length]);
-            snr_estimator = new M2M4SNREstimator();
+            snrEstimator = new M2M4SNREstimator();
         }
         #endregion
         
@@ -161,7 +161,7 @@ namespace RX_SSDV.DSP
 
             int equalizerOutputSize = equalizer.Process(clockOutputSize, inputBufferI, inputBufferQ, outputBufferI, outputBufferQ);
 
-            snr_estimator.update(equalizerOutputSize, outputBufferI, outputBufferQ);
+            snrEstimator.Update(equalizerOutputSize, outputBufferI, outputBufferQ);
 
             outputCount = equalizerOutputSize;
 

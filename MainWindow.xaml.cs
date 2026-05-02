@@ -323,6 +323,25 @@ namespace RX_SSDV
             }
         }
 
+        private void resetProcessBtn_Click(object sender, RoutedEventArgs e)
+        {
+            mainDSP.ResetDecoder();
+        }
+
+        private void processSymbolRate_LostFocus(object sender, RoutedEventArgs e)
+        {
+            int symbolRate = MainDSP.symbolRate;
+            if (int.TryParse(processSymbolRate.Text, out symbolRate))
+            {
+                processSymbolRate.Text = $"{symbolRate}";
+                MainDSP.symbolRate = symbolRate;
+            }
+            else
+            {
+                processSymbolRate.Text = MainDSP.symbolRate.ToString();
+            }
+        }
+
         private void satDataList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             PacketInfo? packet = satDataList.SelectedItem as PacketInfo;

@@ -401,7 +401,7 @@ namespace RX_SSDV.DSP
                     $"\nTime {SampleSource.GetFormatedTimeString()}" +
                     $"\nCostas Loop [freq = {bpskDemod.costasLoop.Phase}, phase = {bpskDemod.costasLoop.Phase}]" +
                     $"\nClock Sync [mu = {bpskDemod.clockRecovery.Mu}, omega = {bpskDemod.clockRecovery.Omega}]" +
-                    $"\nSNR: {bpskDemod.snr_estimator.snr()}db",
+                    $"\nSNR: {bpskDemod.snrEstimator.SNR} db",
                     font, brush, new Point(5, 5));
 
                 //Separator
@@ -578,10 +578,10 @@ namespace RX_SSDV.DSP
                 }
                 fft.Direct(realSignal, imagSignal, fftReal, fftImag);
 
-                const double offset = 0.00000001; //Add a tiny offset to prevent doing Log10(0)
+                const double offset = 1.00000000; //Add a tiny offset to prevent doing Log10(0) | AstarLC4036: Use value '1' to avoid negative magnitude
 
                 double[] tempSpectrum = fftReal
-                    .Select((v, i) => 10*Math.Log10( Math.Sqrt(v * v + fftImag[i] * fftImag[i]) + offset) )
+                    .Select((v, i) => 10 * Math.Log10(Math.Sqrt(v * v + fftImag[i] * fftImag[i]) + offset))
                     .ToArray();
 
                 //must new object, or use object pool
