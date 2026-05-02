@@ -402,10 +402,12 @@ namespace RX_SSDV.DSP
                 //Analyze
                 //不要担心这里编译器会帮你优化成StringBuilder的
                 graphics.DrawString(
+                    "[DEBUG & Status]\n" +
                     $"FFT[{FFT_SIZE}](Visualizing index range: {(FFT_RANGE < 0 ? "Unlimited" : " 0 - " + FFT_RANGE)} Freq: -{maxFreq / 2000}kHz - {maxFreq / 2000}kHz )" +
-                    $"\nInput Signal[Real {lengthReal}, Imag {lengthImag}]" +
-                    $"\nOutput FFT[{magnitudeSpectrum.Length}]" +
-                    $"\nBandwidth: {bandwidth}kHz, Frequency Shift: {frequencyShift}kHz" +
+                    //$"\nInput Signal[Real {lengthReal}, Imag {lengthImag}]" +
+                    //$"\nOutput FFT[{magnitudeSpectrum.Length}]" +
+                    //$"\nFilter: [ Bandwidth: {bandwidth}kHz, Frequency Shift: {frequencyShift}kHz ]" +
+                    //$"\nFrequency Shift: {demodulator.freqShift.Freq}kHz" +
                     $"\nTime {SampleSource.GetFormatedTimeString()}" +
                     //$"\nCostas Loop [freq = {demodulator.costasLoop.Phase}, phase = {demodulator.costasLoop.Phase}]" +
                     //$"\nClock Sync [mu = {demodulator.clockRecovery.Mu}, omega = {demodulator.clockRecovery.Omega}]" +
@@ -435,7 +437,7 @@ namespace RX_SSDV.DSP
                                 x = lastX + 1;
                             }
                             int value = (int)Math.Clamp(data[k] * spectrumScale, 0, 255);
-                            //spectrumCacheBitmap.SetPixel(x, 0, Color.FromArgb(value, 0, 255 / 4));
+                            //spectrumCacheBitmap.SetPixel(x, 0, Color.FromArgb(value, 0, 255 / 4)); // Old color
                             spectrumCacheBitmap.SetPixel(x, 0, ColorFade.GetColorHSV(value, 0, 255));
                             lastX = x;
                         }
