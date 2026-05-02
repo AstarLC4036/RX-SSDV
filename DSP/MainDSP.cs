@@ -48,7 +48,7 @@ namespace RX_SSDV.DSP
         //public const int FFT_MIN = 0;
         public const int FFT_POS = 100;
         public const int FFT_RANGE = -1;//2048
-        public float spectrumScale = 0.01f;
+        public float spectrumScale = 5f;
         public int spectrumPeriod = 1;
         public int fftDatasetIndex = 0;
         public double[][] fftDataset;
@@ -86,8 +86,8 @@ namespace RX_SSDV.DSP
 
         #region SSDV Process
         //TODO: make it editable
-        public static int symbolRate = 9600;
-        public static int packetSize = 255;
+        //public static int symbolRate = 9600;
+        //public static int packetSize = 255;
         private static int samplesPerSymbol = 5;
         public static int SamplePerSymbol => samplesPerSymbol;
 
@@ -104,14 +104,18 @@ namespace RX_SSDV.DSP
         }
         private bool enableProcess = false;
 
+        public static DecoderSet decoderSet;
+
         //BPSK Demod
-        public BpskDemod bpskDemod;
+        //public BpskDemod bpskDemod;
+        public Demodulator demodulator;
         private float[] demodOutputI;
         private float[] demodOutputQ;
         private int demodOutputSize;
 
         //CCSDS Decode
-        public CCSDSDecoder ccsds;
+        //public CCSDSDecoder ccsds;
+        public IDecoder decoder;
         private byte[] decodeOutput;
         private int decodeOutputSize;
 
@@ -147,8 +151,9 @@ namespace RX_SSDV.DSP
         private void Init()
         {
             fft = new Fft(FFT_SIZE);
-            bpskDemod = new BpskDemod();
-            ccsds = new CCSDSDecoder(true, true, packetSize, new AsrtuDecoder());
+
+            decoderSet = DecoderSet.LoadPreset(DecoderSet.Satellite.AO123);
+            ResetDecoder();
 
             UpdateBitmap(spectrum.Width);
 
@@ -161,7 +166,10 @@ namespace RX_SSDV.DSP
 
         public void ResetDecoder()
         {
-            bpskDemod = new BpskDemod();
+            demodulator = decoderSet.GetDemodulator();
+            decoder = decoderSet.GetDecoder();
+
+            Logger.CLogInfo($"Decoder updated: {decoderSet.demodulator} {decoderSet.symbolRate}bps, {decoderSet.decoder} (frame size:{decoderSet.packetSize}), {decoderSet.processor}");
         }
 
         /// <summary>
@@ -170,7 +178,7 @@ namespace RX_SSDV.DSP
         /// <returns>Samples per symbol</returns>
         public static int GetSPS()
         {
-            int sps = sampleRate / symbolRate;
+            int sps = sampleRate / decoderSet.symbolRate;
             return sps;
         }
 
@@ -180,7 +188,7 @@ namespace RX_SSDV.DSP
             freqPerSample = waveFormat.SampleRate / FFT_SIZE;
             sampleRate = waveFormat.SampleRate;
             samplesPerSymbol = GetSPS(); //Update sps
-            bpskDemod.OnSampleSourceChange(waveFormat);
+            demodulator.OnSampleSourceChange(waveFormat);
         }
 
         /// <summary>
@@ -385,9 +393,9 @@ namespace RX_SSDV.DSP
                     graphics.FillRectangle(bfBrush, centerPos + (int)(bpMin * scaleCoeff), 0, (bpMax - bpMin) * scaleCoeff, spectrum.Height - FFT_POS);
                 }
 
-                if (bpskDemod != null)
+                if (demodulator != null && demodulator.useFreqShift)
                 {
-                    int freq = (int)bpskDemod.freqShift.Freq;
+                    int freq = (int)demodulator.freqShift.Freq;
                     graphics.DrawLine(Pens.Blue, new Point(centerPos + (int)(freq * scaleCoeff), 0), new Point(centerPos + (int)(freq * scaleCoeff), spectrum.Height - FFT_POS));
                 }
 
@@ -399,9 +407,9 @@ namespace RX_SSDV.DSP
                     $"\nOutput FFT[{magnitudeSpectrum.Length}]" +
                     $"\nBandwidth: {bandwidth}kHz, Frequency Shift: {frequencyShift}kHz" +
                     $"\nTime {SampleSource.GetFormatedTimeString()}" +
-                    $"\nCostas Loop [freq = {bpskDemod.costasLoop.Phase}, phase = {bpskDemod.costasLoop.Phase}]" +
-                    $"\nClock Sync [mu = {bpskDemod.clockRecovery.Mu}, omega = {bpskDemod.clockRecovery.Omega}]" +
-                    $"\nSNR: {bpskDemod.snrEstimator.SNR} db",
+                    //$"\nCostas Loop [freq = {demodulator.costasLoop.Phase}, phase = {demodulator.costasLoop.Phase}]" +
+                    //$"\nClock Sync [mu = {demodulator.clockRecovery.Mu}, omega = {demodulator.clockRecovery.Omega}]" +
+                    $"\nSNR: {demodulator.snrEstimator.SNR} db",
                     font, brush, new Point(5, 5));
 
                 //Separator
@@ -519,14 +527,14 @@ namespace RX_SSDV.DSP
             CheckBPSKOutputAvalible();
             //ClearBPSKOutputArray();
 
-            bpskDemod.Process(realSignal, imagSignal, demodOutputI, demodOutputQ, out demodOutputSize);
+            demodulator.Process(realSignal, imagSignal, demodOutputI, demodOutputQ, out demodOutputSize);
         }
 
         public void ProcessCCSDS(float[] realSignal, float[] imagSignal)
         {
             CheckCCSDSOutputAvalible();
 
-            ccsds.Process(realSignal, imagSignal, decodeOutput, out decodeOutputSize, demodOutputSize);
+            decoder.Process(realSignal, imagSignal, decodeOutput, out decodeOutputSize, demodOutputSize);
         }
 
         /// <summary>

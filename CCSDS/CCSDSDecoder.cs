@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace RX_SSDV.CCSDS
 {
-    public class CCSDSDecoder
+    public class CCSDSDecoder : IDecoder
     {
         //Processors
         private Viterbi.Viterbi viterbiDecoder0;
@@ -25,7 +25,7 @@ namespace RX_SSDV.CCSDS
         private BitDelay delay;
 
         //Decoder
-        private ITransportDecoder decoder;
+        private ITransportDecoder? decoder;
 
         //Decoder Config
         private bool useDiffDecode = false;
@@ -41,7 +41,17 @@ namespace RX_SSDV.CCSDS
 
         public const int DIGITAL_BUFFER_SIZE = 1024;
 
+        public CCSDSDecoder()
+        {
+            Init(true, true, 255, null);
+        }
+
         public CCSDSDecoder(bool useDiffDecode, bool useDescrambling, int frameSize, ITransportDecoder decoder)
+        {
+            Init(useDiffDecode, useDescrambling, frameSize, decoder);
+        }
+
+        public void Init(bool useDiffDecode, bool useDescrambling, int frameSize, ITransportDecoder? decoder)
         {
             this.useDiffDecode = useDiffDecode;
             this.useDescrambling = useDescrambling;
@@ -140,7 +150,8 @@ namespace RX_SSDV.CCSDS
             }
             //Logger.CLog("\n");
 
-            decoder.ProcessPacket(packetByteBuffer);
+            if(decoder != null)
+                decoder.ProcessPacket(packetByteBuffer);
         }
 
         /// <summary>

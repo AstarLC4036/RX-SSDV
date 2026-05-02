@@ -13,7 +13,7 @@ namespace RX_SSDV.DSP
         private float d_alpha, d_beta;
         private float d_signal, d_noise;
 
-        private float snrCalculated;
+        private float snrCalculated = float.NaN;
         public float SNR => snrCalculated;
 
         public M2M4SNREstimator(float alpha=0.001f)
@@ -39,10 +39,10 @@ namespace RX_SSDV.DSP
                 d_y2 = d_alpha * y2 + d_beta * d_y2;
             }
 
-            if (d_y1 != d_y1)
-                d_y1 = 0;
-            if (d_y2 != d_y2)
-                d_y2 = 0;
+            //if (d_y1 != d_y1)
+            //    d_y1 = 0;
+            //if (d_y2 != d_y2)
+            //    d_y2 = 0;
 
             snrCalculated = CalcSnr();
         }

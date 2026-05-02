@@ -11,15 +11,15 @@ using NAudio.Wave;
 
 namespace RX_SSDV.DSP
 {
-    public class BpskDemod
+    public class BpskDemod : Demodulator
     {
         public CostasLoop costasLoop;
         public LMS_DD_Equalizer equalizer;
         public ClockRecoveryBlock_MM clockRecovery;
         public FeedforwardAGC agc;
         public ComplexFirFilter rrcFilter;
-        public FreqShift freqShift;
-        public M2M4SNREstimator snrEstimator;
+        //public FreqShift freqShift;
+        //public M2M4SNREstimator snrEstimator;
 
         private float[] outputBufferI;
         private float[] outputBufferQ;
@@ -111,10 +111,12 @@ namespace RX_SSDV.DSP
             float[] rrcTaps = FilterUtils.RootRaisedCosine(16, MainDSP.GetSPS(), 1 , 0.35f, 11 * MainDSP.SamplePerSymbol);
             rrcFilter = new ComplexFirFilter(rrcTaps, new float[rrcTaps.Length]);
             snrEstimator = new M2M4SNREstimator();
+
+            useFreqShift = true;
         }
         #endregion
         
-        public void OnSampleSourceChange(WaveFormat waveFormat)
+        public override void OnSampleSourceChange(WaveFormat waveFormat)
         {
             clockRecovery = new ClockRecoveryBlock_MM(0.5f, 0.175f, MainDSP.SamplePerSymbol, 0.75f * 0.75f, 0.05f);
         }
@@ -138,8 +140,7 @@ namespace RX_SSDV.DSP
         /// <param name="outReal">Output signal I(Real)</param>
         /// <param name="outImag">Output signal Q(Imag)</param>
         /// <param name="outputCount">Output array count</param>
-        /// <param name="cutArray">Cut output array</param>
-        public void Process(float[] realSignal, float[] imagSignal, float[] outReal, float[] outImag, out int outputCount)
+        public override void Process(float[] realSignal, float[] imagSignal, float[] outReal, float[] outImag, out int outputCount)
         {
             CheckProcessOutputArr(realSignal.Length);
             CheckBlocks();

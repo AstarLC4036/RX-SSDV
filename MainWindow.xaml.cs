@@ -49,6 +49,17 @@ namespace RX_SSDV
 
         private bool isComponentsInited = false;
 
+        private Dictionary<string, DecoderSet.Satellite> satellites = new Dictionary<string, DecoderSet.Satellite>()
+        {
+            { "Custom", DecoderSet.Satellite.None },
+            { "AO-123(ASRTU-1)", DecoderSet.Satellite.AO123 }
+        };
+
+        private Dictionary<string, DecoderSet.Demodulator> modulations = new Dictionary<string, DecoderSet.Demodulator>()
+        {
+            { "BPSK", DecoderSet.Demodulator.BPSK },
+        };
+
         public MainWindow()
         {
             instance = this;
@@ -76,13 +87,13 @@ namespace RX_SSDV
 
         private void Init()
         {
-            Logger.Log("[Info] Starting up...");
+            Logger.Log("Starting up...\n");
             Settings.ApplySettings(); //init language
 
             InitDrawer();
-            InitDSP(); 
             InitUI();
-            Logger.Log(" done\n");
+            InitDSP(); 
+            Logger.Log("done\n");
         }
 
         private void InitDSP()
@@ -94,6 +105,12 @@ namespace RX_SSDV
         private void InitUI()
         {
             satData = new SatDataUI(this);
+
+            processSatellite.ItemsSource = satellites.Keys;
+            processSatellite.SelectedIndex = 0;
+
+            processModulation.ItemsSource = modulations.Keys;
+            processModulation.SelectedIndex = 0;
         }
 
         private void InitDrawer()
@@ -105,10 +122,13 @@ namespace RX_SSDV
 
         private void SetDSPArguments()
         {
-            bandWidthInput.Text = mainDSP.bandwidth.ToString();
-            freqShiftInput.Text = mainDSP.frequencyShift.ToString();
+            filterBandWidthInput.Text = mainDSP.bandwidth.ToString();
+            filterFreqShiftInput.Text = mainDSP.frequencyShift.ToString();
             drawerPeriodInput.Text = mainDSP.spectrumPeriod.ToString();
             constellationScaleBox.Text = mainDSP.ConstellationMultiply.ToString();
+            spectrumScaleBox.Text = mainDSP.spectrumScale.ToString();
+            processSymbolRate.Text = MainDSP.decoderSet.symbolRate.ToString();
+            processModulation.SelectedItem = modulations.FirstOrDefault(x => x.Value == MainDSP.decoderSet.demodulator);
         }
 
         private void LogLogo()
@@ -194,15 +214,15 @@ namespace RX_SSDV
             SampleSource.Stop();
         }
 
-        private void bandWidthInput_LostFocus(object sender, RoutedEventArgs e)
+        private void filterBandWidthInput_LostFocus(object sender, RoutedEventArgs e)
         {
             int bandwidth = 1;
-            if(int.TryParse(bandWidthInput.Text, out bandwidth))
+            if(int.TryParse(filterBandWidthInput.Text, out bandwidth))
             {
                 if (bandwidth < 1)
                     bandwidth = 1;
 
-                bandWidthInput.Text = $"{bandwidth}";
+                filterBandWidthInput.Text = $"{bandwidth}";
                 if (mainDSP != null)
                 {
                     mainDSP.bandwidth = bandwidth;
@@ -211,16 +231,16 @@ namespace RX_SSDV
             }
             else
             {
-                bandWidthInput.Text = "0";
+                filterBandWidthInput.Text = "0";
             }
         }
 
-        private void freqShiftInput_LostFocus(object sender, RoutedEventArgs e)
+        private void filterFreqShiftInput_LostFocus(object sender, RoutedEventArgs e)
         {
             int freqShift = 0;
-            if (int.TryParse(freqShiftInput.Text, out freqShift))
+            if (int.TryParse(filterFreqShiftInput.Text, out freqShift))
             {
-                freqShiftInput.Text = $"{freqShift}";
+                filterFreqShiftInput.Text = $"{freqShift}";
                 if (mainDSP != null)
                 {
                     mainDSP.frequencyShift = freqShift;
@@ -229,7 +249,7 @@ namespace RX_SSDV
             }
             else
             {
-                freqShiftInput.Text = "0";
+                filterFreqShiftInput.Text = "0";
             }
         }
 
@@ -311,15 +331,15 @@ namespace RX_SSDV
 
         private void freqShiftBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            float freqShift = mainDSP.bpskDemod.freqShift.Freq;
+            float freqShift = mainDSP.demodulator.freqShift.Freq;
             if (float.TryParse(freqShiftBox.Text, out freqShift))
             {
                 freqShiftBox.Text = $"{freqShift}";
-                mainDSP.bpskDemod.freqShift.Freq = freqShift;
+                mainDSP.demodulator.freqShift.Freq = freqShift;
             }
             else
             {
-                freqShiftBox.Text = mainDSP.bpskDemod.freqShift.Freq.ToString();
+                freqShiftBox.Text = mainDSP.demodulator.freqShift.Freq.ToString();
             }
         }
 
@@ -330,15 +350,15 @@ namespace RX_SSDV
 
         private void processSymbolRate_LostFocus(object sender, RoutedEventArgs e)
         {
-            int symbolRate = MainDSP.symbolRate;
+            int symbolRate = MainDSP.decoderSet.symbolRate;
             if (int.TryParse(processSymbolRate.Text, out symbolRate))
             {
                 processSymbolRate.Text = $"{symbolRate}";
-                MainDSP.symbolRate = symbolRate;
+                MainDSP.decoderSet.symbolRate = symbolRate;
             }
             else
             {
-                processSymbolRate.Text = MainDSP.symbolRate.ToString();
+                processSymbolRate.Text = MainDSP.decoderSet.symbolRate.ToString();
             }
         }
 
@@ -356,6 +376,12 @@ namespace RX_SSDV
         private void clearLogBtn_Click(object sender, RoutedEventArgs e)
         {
             Logger.ClearLog();
+        }
+
+        private void processSatellite_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DecoderSet decoderSet = DecoderSet.LoadPreset(satellites[(string)processSatellite.SelectedValue]);
+            MainDSP.decoderSet = decoderSet;
         }
 
         //private void applyFilterBtn_Click(object sender, RoutedEventArgs e)
