@@ -7,7 +7,7 @@
 
 # RX-SSDV (zh-cn)
 一个基于 `WPF` 的简单SSDV基带解码器。<br>
-使用的解码器: [SSDV](https://github.com/fsphil/ssdv)<br>
+> 使用的解码器: [SSDV](https://github.com/fsphil/ssdv)<br>
 **注意**: 这个项目还在开发，所以可能有大量的Bug并且许多功能不太完善。
 
 ### 提示
