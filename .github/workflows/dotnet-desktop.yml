@@ -92,7 +92,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Build
-        path: bin\${{ matrix.configuration }}
+        path: D:\a\RX-SSDV\RX-SSDV\bin\${{ matrix.configuration }}
 
     # This project does not have MSIX
     # # Decode the base 64 encoded pfx and save the Signing_Certificate
