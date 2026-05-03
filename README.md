@@ -1,4 +1,9 @@
-[English README](https://github.com/AstarLC4036/RX-SSDV/blob/main/README.md) | [中文 README](https://github.com/AstarLC4036/RX-SSDV/blob/main/README_zh-cn.md)
+<div align="center">
+  <img width="100" height="100" alt="RX-SSDV" src="https://github.com/user-attachments/assets/b9c2d32c-a9e8-47d0-afd3-b29a25dc17b2"/>
+  <h1>RX-SSDV</h1>
+  <a href="https://github.com/AstarLC4036/RX-SSDV/blob/main/README.md">English README</a> | <a href="https://github.com/AstarLC4036/RX-SSDV/blob/main/README_zh-cn.md">中文 README</a>
+</div>
+<br>
 
 # RX-SSDV (en-us)
 A simple baseband SSDV decoder based on `WPF`.<br>
@@ -9,6 +14,7 @@ Decoder used: [SSDV](https://github.com/fsphil/ssdv)<br>
 Use a virtual sound card as audio input(in windows settings) to achieve better demodulation results.
 
 ## How to use
+*Select the required decoder type before starting processing*
 ### Use baseband source
 *Note: Limited function*
 1. Set `Sample Source` to `Baseband File`
