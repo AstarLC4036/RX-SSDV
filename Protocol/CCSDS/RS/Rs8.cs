@@ -13,9 +13,9 @@
 //
 
 using System;
-using static ReedSolomon.Precomputed;
+using static RX_SSDV.Protocol.CCSDS.RS.Precomputed;
 
-namespace ReedSolomon
+namespace RX_SSDV.Protocol.CCSDS.RS
 {
     public static class Rs8
     {

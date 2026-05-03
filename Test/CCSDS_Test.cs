@@ -1,6 +1,6 @@
 ﻿using RX_SSDV.Base;
-using RX_SSDV.CCSDS;
-using RX_SSDV.CCSDS.Viterbi;
+using RX_SSDV.Protocol.CCSDS;
+using RX_SSDV.Protocol.CCSDS.Viterbi;
 using System;
 using System.Collections.Generic;
 using System.Linq;

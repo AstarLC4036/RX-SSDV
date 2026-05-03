@@ -1,5 +1,6 @@
 ﻿using RX_SSDV.Base;
 using RX_SSDV.DSP;
+using RX_SSDV.Protocol.CCSDS;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Drawing2D;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using static RX_SSDV.Utils.BinaryUtils;
 
-namespace RX_SSDV.CCSDS.Viterbi
+namespace RX_SSDV.Protocol.CCSDS.Viterbi
 {
     /// <summary>
     /// Viterbi for (n,k,N) = (2,1,7) convolutional code.

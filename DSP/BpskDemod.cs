@@ -21,11 +21,6 @@ namespace RX_SSDV.DSP
         //public FreqShift freqShift;
         //public M2M4SNREstimator snrEstimator;
 
-        private float[] outputBufferI;
-        private float[] outputBufferQ;
-        private float[] inputBufferI;
-        private float[] inputBufferQ;
-
         private static float imaginaryPoint = 1;
 
         public BpskDemod()
@@ -103,8 +98,8 @@ namespace RX_SSDV.DSP
         //Make it looks more easier!
         public void InitModulesDefault()
         {
-            freqShift = new FreqShift(48000, 0);
-            costasLoop = new CostasLoop(0.1f, 10);
+            freqShift = new FreqShift(MainDSP.SampleRate, 0);
+            costasLoop = new CostasLoop(0.1f, 10, 2);
             equalizer = LMS_DD_Equalizer.BuildEqualizer(0.05f, 1, 1);
             clockRecovery = new ClockRecoveryBlock_MM(0.5f, 0.175f, MainDSP.SamplePerSymbol, 0.75f * 0.75f, 0.05f);
             agc = new FeedforwardAGC(1, 0.25f);
@@ -118,18 +113,8 @@ namespace RX_SSDV.DSP
         
         public override void OnSampleSourceChange(WaveFormat waveFormat)
         {
+            freqShift = new FreqShift(MainDSP.SampleRate, 0);
             clockRecovery = new ClockRecoveryBlock_MM(0.5f, 0.175f, MainDSP.SamplePerSymbol, 0.75f * 0.75f, 0.05f);
-        }
-
-        private void ConfigureOutput()
-        {
-            float[] temp = outputBufferI;
-            outputBufferI = inputBufferI;
-            inputBufferI = temp;
-
-            temp = outputBufferQ;
-            outputBufferQ = inputBufferQ;
-            inputBufferQ = temp;
         }
 
         /// <summary>
@@ -223,25 +208,6 @@ namespace RX_SSDV.DSP
             }
         }
         */
-
-        /// <summary>
-        /// Check output if arrays avalible, if not, init array(s) by 'arrSize'.
-        /// </summary>
-        /// <param name="arrSize">Array size</param>
-        public void CheckProcessOutputArr(int arrSize)
-        {
-            if (ArrayUtil.CheckNeedUpdate(inputBufferI, arrSize) || ArrayUtil.CheckNeedUpdate(inputBufferQ, arrSize))
-            {
-                inputBufferI = new float[arrSize];
-                inputBufferQ = new float[arrSize];
-            }
-
-            if (ArrayUtil.CheckNeedUpdate(outputBufferI, arrSize) || ArrayUtil.CheckNeedUpdate(outputBufferQ, arrSize))
-            {
-                outputBufferI = new float[arrSize];
-                outputBufferQ = new float[arrSize];
-            }
-        }
 
         /// <summary>
         /// Decision maker of BPSK modulation.

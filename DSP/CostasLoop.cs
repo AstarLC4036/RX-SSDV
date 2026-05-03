@@ -23,12 +23,14 @@ namespace RX_SSDV.DSP
 
         private float error = 0;
 
+        private int order = 2;
+
         /// <summary>
         /// Construct a <see cref="CostasLoop">.
         /// </summary>
         /// <param name="loopBw">Loop bandwidth</param>
         /// <param name="freqLimit">Frequency limit</param>
-        public CostasLoop(float loopBw, float freqLimit)
+        public CostasLoop(float loopBw, float freqLimit, int order)
         {
             freqLimitMin = -freqLimit;
             freqLimitMax = freqLimit;
@@ -37,6 +39,7 @@ namespace RX_SSDV.DSP
             float denom = (1.0f + 2.0f * damping * loopBw + loopBw * loopBw);
             alpha = (4 * damping * loopBw) / denom;
             beta = (4 * loopBw * loopBw) / denom;
+            this.order = order;
         }
 
         /// <summary>
@@ -62,8 +65,19 @@ namespace RX_SSDV.DSP
                 outputReal[i] = (float)outSample.Real;
                 outputImag[i] = (float)outSample.Imaginary;
 
-                //The order equals 2, because the loop only aims at BPSK, instead QPSK, 8-PSK...
-                error = BranchlessClip((float)(outSample.Real * outSample.Imaginary), 1.0f);
+                if (order == 2) // BPSK
+                {
+                    error = BranchlessClip((float)(outSample.Real * outSample.Imaginary), 1.0f);
+                }
+                else if (order == 4) // QPSK/OQPSK/GMSK/GFSK
+                {
+                    error = BranchlessClip((float)((outSample.Real > 0.0f ? 1.0f : -1.0f) * outSample.Imaginary - (outSample.Imaginary > 0.0f ? 1.0f : -1.0f) * outSample.Real), 1);
+                }
+                else
+                {
+                    //oh hell no
+                    throw new ArgumentOutOfRangeException("the 'order' must is 2 or 4");
+                }
 
                 //Calc new arguments
                 freq += beta * error;

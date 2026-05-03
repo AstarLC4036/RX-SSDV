@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RX_SSDV.CCSDS
+namespace RX_SSDV.Protocol
 {
     public interface IDecoder
     {
         public void Init(bool useDiffDecode, bool useDescrambling, int frameSize, ITransportDecoder? decoder);
+        //public void Init(); //For usp
         public void Process(float[] inputSamplesI, float[] inputSamplesQ, byte[] outputBits, out int outputSize, int inputSize = -1);
     }
 }

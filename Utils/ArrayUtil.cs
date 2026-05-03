@@ -55,5 +55,19 @@ namespace RX_SSDV.Utils
         {
             Buffer.BlockCopy(source, sourceOffset * _32Bits, destination, destinationOffset * _32Bits, size * _32Bits);
         }
+
+        public static int IndexOf<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TValue value)
+        {
+            int i = 0;
+            foreach (var pair in dictionary)
+            {
+                if (pair.Value.Equals(value))
+                {
+                    return i;
+                }
+                i++;
+            }
+            return -1;
+        }
     }
 }

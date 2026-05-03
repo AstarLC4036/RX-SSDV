@@ -1,6 +1,6 @@
 ﻿using NWaves.Utils;
 using RX_SSDV.Base;
-using RX_SSDV.CCSDS.Viterbi;
+using RX_SSDV.Protocol.CCSDS.Viterbi;
 using RX_SSDV.Utils;
 using System;
 using System.Collections.Generic;

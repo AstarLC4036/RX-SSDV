@@ -1,5 +1,5 @@
 ﻿using RX_SSDV.Base;
-using RX_SSDV.CCSDS;
+using RX_SSDV.Protocol.CCSDS;
 using RX_SSDV.Decoder;
 using RX_SSDV.DSP;
 using RX_SSDV.Graphic;
@@ -52,12 +52,14 @@ namespace RX_SSDV
         private Dictionary<string, DecoderSet.Satellite> satellites = new Dictionary<string, DecoderSet.Satellite>()
         {
             { "Custom", DecoderSet.Satellite.None },
-            { "AO-123(ASRTU-1)", DecoderSet.Satellite.AO123 }
+            { "AO-123(ASRTU-1)", DecoderSet.Satellite.AO123 },
+            { "Geoscan", DecoderSet.Satellite.GEOSCAN }
         };
 
         private Dictionary<string, DecoderSet.Demodulator> modulations = new Dictionary<string, DecoderSet.Demodulator>()
         {
             { "BPSK", DecoderSet.Demodulator.BPSK },
+            { "GMSK", DecoderSet.Demodulator.GMSK }
         };
 
         public MainWindow()
@@ -128,7 +130,7 @@ namespace RX_SSDV
             constellationScaleBox.Text = mainDSP.ConstellationMultiply.ToString();
             spectrumScaleBox.Text = mainDSP.spectrumScale.ToString();
             processSymbolRate.Text = MainDSP.decoderSet.symbolRate.ToString();
-            processModulation.SelectedItem = modulations.FirstOrDefault(x => x.Value == MainDSP.decoderSet.demodulator);
+            processModulation.SelectedIndex = modulations.IndexOf(MainDSP.decoderSet.demodulator);
         }
 
         private void LogLogo()
@@ -382,6 +384,8 @@ namespace RX_SSDV
         {
             DecoderSet decoderSet = DecoderSet.LoadPreset(satellites[(string)processSatellite.SelectedValue]);
             MainDSP.decoderSet = decoderSet;
+            processModulation.SelectedIndex = modulations.IndexOf(decoderSet.demodulator);
+            processSymbolRate.Text = decoderSet.symbolRate.ToString();
         }
 
         //private void applyFilterBtn_Click(object sender, RoutedEventArgs e)

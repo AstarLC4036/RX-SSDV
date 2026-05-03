@@ -9,7 +9,7 @@ using System.Printing;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RX_SSDV.CCSDS
+namespace RX_SSDV.Protocol.CCSDS
 {
     /// <summary>
     /// Single array version of <see cref="RingBufferIQ"/>

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls.Primitives;
 using static RX_SSDV.Utils.BinaryUtils;
 
-namespace RX_SSDV.CCSDS.Viterbi
+namespace RX_SSDV.Protocol.CCSDS.Viterbi
 {
     public class Trellis
     {

@@ -1,6 +1,6 @@
-﻿using ReedSolomon;
-using RX_SSDV.Base;
+﻿using RX_SSDV.Base;
 using RX_SSDV.IO;
+using RX_SSDV.Protocol.CCSDS.RS;
 using RX_SSDV.UI;
 using RX_SSDV.Utils;
 using System;

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RX_SSDV.CCSDS
+namespace RX_SSDV.Protocol.CCSDS
 {
     //DspBlock but no IQ ^-^
     /// <summary>

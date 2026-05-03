@@ -1,6 +1,6 @@
 ﻿using NWaves.Utils;
 using RX_SSDV.Base;
-using RX_SSDV.CCSDS.Viterbi;
+using RX_SSDV.Protocol.CCSDS.Viterbi;
 using RX_SSDV.Decoder;
 using RX_SSDV.IO;
 using RX_SSDV.Utils;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RX_SSDV.CCSDS
+namespace RX_SSDV.Protocol.CCSDS
 {
     public class CCSDSDecoder : IDecoder
     {

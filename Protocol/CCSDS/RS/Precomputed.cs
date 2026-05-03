@@ -1,6 +1,6 @@
 ﻿// Author: Ryan Crosby, September 2018
 
-namespace ReedSolomon
+namespace RX_SSDV.Protocol.CCSDS.RS
 {
     /// <summary>
     /// Precomputed values for CCSDS RS (255, 223)
