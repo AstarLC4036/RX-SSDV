@@ -67,11 +67,11 @@ namespace RX_SSDV.Decoder
                 decoderTimer = new Timer(RECEIVE_TIMEOUT_DEFAULT);
             }
             decoderTimer.Elapsed += (object? e, ElapsedEventArgs args) => {
-                DecoderTimerElspsed();
+                ReleaseTimerAndDecode();
             };
         }
 
-        private void DecoderTimerElspsed()
+        private void ReleaseTimerAndDecode()
         {
             //lastImageId = -1;
             //lastPacketId = -1;
@@ -97,7 +97,7 @@ namespace RX_SSDV.Decoder
                 {
                     //Logger.CLogInfo("[Packet RX][ASRTU-1] SSDV packet received.");
 
-                    // Restart timer
+                    // Restart timer(Decoder timeout)
                     if (decoderTimer == null)
                     {
                         ResetTimer();
@@ -120,7 +120,7 @@ namespace RX_SSDV.Decoder
                     Logger.CLogInfo($"[Packet RX][ASRTU-1] SSDV packet received. Image id: {imageId}, Packet id: {packetId}");
 
                     // Is this a new picture?
-                    if (imageId != lastImageId || packetId != lastPacketId + 1)
+                    if (imageId != lastImageId /*|| packetId != lastPacketId + 1*/)
                     {
                         OnReceiveNewImage();
 
@@ -155,6 +155,12 @@ namespace RX_SSDV.Decoder
                     }
 
                     byteOutput.WriteBytes(dataBuffer); // Write file
+                    
+                    // If we got the last packet, decode it directly.
+                    if(ReadLastPacketFlag(dataBuffer))
+                    {
+                        ReleaseTimerAndDecode();
+                    }
                 }
                 else if (packet[1] == 0x24) //Telemetry packet
                 {
@@ -200,6 +206,17 @@ namespace RX_SSDV.Decoder
             byte imageId = packet[6];
             int packetId = (packet[7] << 8) | packet[8];
             return (imageId, packetId);
+        }
+
+        private bool ReadLastPacketFlag(byte[] packet)
+        {
+            //two methods
+            byte flags = packet[11];
+            byte lastPacketFlag = (byte)((flags << 2) & 1);
+
+            int packetId = (packet[7] << 8) | packet[8];
+            int maxPacketId = packet[9] * packet[10];
+            return (lastPacketFlag == 1 || packetId == maxPacketId);
         }
 
         private uint CalcCRC32(byte[] buffer)

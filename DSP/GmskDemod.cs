@@ -21,7 +21,7 @@ namespace RX_SSDV.DSP
         public void InitModulesDefault()
         {
             freqShift = new FreqShift(MainDSP.SampleRate, 0);
-            costasLoop = new CostasLoop(0.1f, 10, 4);
+            costasLoop = new CostasLoop(0.01f, 10, 4);
             agc = new FeedforwardAGC(1, 0.25f);
             snrEstimator = new M2M4SNREstimator();
 

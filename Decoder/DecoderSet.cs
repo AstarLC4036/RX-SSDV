@@ -30,7 +30,7 @@ namespace RX_SSDV.Decoder
 
         public enum Decoder
         {
-            CSP,
+            CCSDS,
             USP
         }
 
@@ -41,14 +41,14 @@ namespace RX_SSDV.Decoder
         }
 
         public Demodulator demodulator = Demodulator.BPSK;
-        public Decoder decoder = Decoder.CSP;
+        public Decoder decoder = Decoder.CCSDS;
         public DataProcessor processor = DataProcessor.SSDV;
         public int symbolRate = 1200;
         public int packetSize = 255;
 
         public static Dictionary<Satellite, DecoderSet> presetDecoders = new Dictionary<Satellite, DecoderSet>()
         {
-            { Satellite.AO123, new DecoderSet(Demodulator.BPSK, Decoder.CSP, DataProcessor.AO123Decoder, 9600, 255) }, //AO-123(ASRTU-1) BPSK 9600bps r=1/2 CCSDS Concatenated SSDV & TLM
+            { Satellite.AO123, new DecoderSet(Demodulator.BPSK, Decoder.CCSDS, DataProcessor.AO123Decoder, 9600, 255) }, //AO-123(ASRTU-1) BPSK 9600bps r=1/2 CCSDS Concatenated SSDV & TLM
             { Satellite.GEOSCAN, new DecoderSet(Demodulator.GMSK, Decoder.USP, DataProcessor.SSDV, 9600, 255) } //Geoscan GMSK 9600bps USP SSDV & TLM
         };
         public static Dictionary<Demodulator, Type> demodulators = new Dictionary<Demodulator, Type>()
@@ -58,7 +58,7 @@ namespace RX_SSDV.Decoder
         };
         public static Dictionary<Decoder, Type> decoders = new Dictionary<Decoder, Type>()
         {
-            { Decoder.CSP, typeof(CCSDSDecoder) },
+            { Decoder.CCSDS, typeof(CCSDSDecoder) },
             { Decoder.USP, typeof(USPDecoder) }
         };
         public static Dictionary<DataProcessor, Type> processors = new Dictionary<DataProcessor, Type>()
@@ -104,7 +104,7 @@ namespace RX_SSDV.Decoder
 
             switch (decoder)
             {
-                case Decoder.CSP:
+                case Decoder.CCSDS:
                     ((CCSDSDecoder)dec).Init(true, true, packetSize, GetProcessor());
                     break;
                 case Decoder.USP:
